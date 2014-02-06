@@ -97,6 +97,12 @@ public class CacheDispatcher extends Thread {
                     continue;
                 }
 
+                if(request.shouldSkipCache()) {
+                	 request.addMarker("cache-skip");
+                     mNetworkQueue.put(request);
+                     continue;
+                }
+                
                 // Attempt to retrieve this item from cache.
                 Cache.Entry entry = mCache.get(request.getCacheKey());
                 if (entry == null) {

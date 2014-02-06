@@ -84,6 +84,8 @@ public abstract class Request<T> implements Comparable<Request<T>> {
     /** Whether or not responses to this request should be cached. */
     private boolean mShouldCache = true;
 
+    private boolean mShouldSkipCache = false;
+    
     /** Whether or not this request has been canceled. */
     private boolean mCanceled = false;
 
@@ -431,6 +433,15 @@ public abstract class Request<T> implements Comparable<Request<T>> {
      */
     public final boolean shouldCache() {
         return mShouldCache;
+    }
+    
+    
+    public final void setShouldSkipCache(boolean shouldSkipCache) {
+    	mShouldSkipCache = shouldSkipCache;
+    }
+    
+    public final boolean shouldSkipCache() {
+    	return mShouldSkipCache;
     }
 
     /**
