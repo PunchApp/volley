@@ -98,12 +98,16 @@ public class HttpClientStack implements HttpStack {
                 // This is the deprecated way that needs to be handled for backwards compatibility.
                 // If the request's post body is null, then the assumption is that the request is
                 // GET.  Otherwise, it is assumed that the request is a POST.
-                byte[] postBody = request.getPostBody();
-                if (postBody != null) {
+                if(request.getBodyEntity() != null) {
+                    HttpPost postRequest = new HttpPost(request.getUrl());
+                    postRequest.addHeader(HEADER_CONTENT_TYPE, request.getPostBodyContentType());
+                    postRequest.setEntity(request.getBodyEntity());
+                    return postRequest;
+                } else if (request.getPostBody() != null) {
                     HttpPost postRequest = new HttpPost(request.getUrl());
                     postRequest.addHeader(HEADER_CONTENT_TYPE, request.getPostBodyContentType());
                     HttpEntity entity;
-                    entity = new ByteArrayEntity(postBody);
+                    entity = new ByteArrayEntity(request.getPostBody());
                     postRequest.setEntity(entity);
                     return postRequest;
                 } else {
@@ -145,9 +149,11 @@ public class HttpClientStack implements HttpStack {
 
     private static void setEntityIfNonEmptyBody(HttpEntityEnclosingRequestBase httpRequest,
             Request<?> request) throws AuthFailureError {
-        byte[] body = request.getBody();
-        if (body != null) {
-            HttpEntity entity = new ByteArrayEntity(body);
+        if(request.getBodyEntity() != null) {
+            httpRequest.setEntity(request.getBodyEntity());
+        }
+        else if (request.getBody() != null) {
+            HttpEntity entity = new ByteArrayEntity(request.getBody());
             httpRequest.setEntity(entity);
         }
     }

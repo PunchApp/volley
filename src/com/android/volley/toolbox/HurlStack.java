@@ -33,6 +33,7 @@ import org.apache.http.message.BasicStatusLine;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -183,8 +184,16 @@ public class HurlStack implements HttpStack {
                 // This is the deprecated way that needs to be handled for backwards compatibility.
                 // If the request's post body is null, then the assumption is that the request is
                 // GET.  Otherwise, it is assumed that the request is a POST.
-                byte[] postBody = request.getPostBody();
-                if (postBody != null) {
+                if(request.getBodyEntity() != null) {
+                    connection.setDoOutput(true);
+                    connection.setRequestMethod("POST");
+                    connection.addRequestProperty(HEADER_CONTENT_TYPE,
+                            request.getPostBodyContentType());
+                    OutputStream os = connection.getOutputStream();
+                    request.getBodyEntity().writeTo(os);
+                    os.close();
+                }
+                else if (request.getPostBody() != null) {
                     // Prepare output. There is no need to set Content-Length explicitly,
                     // since this is handled by HttpURLConnection using the size of the prepared
                     // output stream.
@@ -193,7 +202,7 @@ public class HurlStack implements HttpStack {
                     connection.addRequestProperty(HEADER_CONTENT_TYPE,
                             request.getPostBodyContentType());
                     DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-                    out.write(postBody);
+                    out.write(request.getPostBody());
                     out.close();
                 }
                 break;
@@ -233,12 +242,17 @@ public class HurlStack implements HttpStack {
 
     private static void addBodyIfExists(HttpURLConnection connection, Request<?> request)
             throws IOException, AuthFailureError {
-        byte[] body = request.getBody();
-        if (body != null) {
+        if(request.getBodyEntity() != null) {
+            connection.setDoOutput(true);
+            connection.addRequestProperty(HEADER_CONTENT_TYPE, request.getBodyContentType());
+            OutputStream os = connection.getOutputStream();
+            request.getBodyEntity().writeTo(os);
+            os.close();
+        } else if (request.getBody() != null) {
             connection.setDoOutput(true);
             connection.addRequestProperty(HEADER_CONTENT_TYPE, request.getBodyContentType());
             DataOutputStream out = new DataOutputStream(connection.getOutputStream());
-            out.write(body);
+            out.write(request.getBody());
             out.close();
         }
     }

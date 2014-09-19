@@ -25,6 +25,8 @@ import android.text.TextUtils;
 
 import com.android.volley.VolleyLog.MarkerLog;
 
+import org.apache.http.HttpEntity;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
@@ -228,7 +230,7 @@ public abstract class Request<T> implements Comparable<Request<T>> {
                     @Override
                     public void run() {
                         mEventLog.add(tag, threadId);
-                        mEventLog.finish(this.toString());
+                        mEventLog.finish(((Object)this).toString());
                     }
                 });
                 return;
@@ -436,6 +438,10 @@ public abstract class Request<T> implements Comparable<Request<T>> {
         if (params != null && params.size() > 0) {
             return encodeParameters(params, getParamsEncoding());
         }
+        return null;
+    }
+
+    public HttpEntity getBodyEntity() throws AuthFailureError {
         return null;
     }
 
