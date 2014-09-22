@@ -23,4 +23,8 @@ android {
         instrumentTest.setRoot('tests')
         instrumentTest.java.srcDirs = ['tests/src']
     }
+
+    dependencies {
+        compile fileTree(dir: 'libs', include: ['*.jar'])
+    }
 }

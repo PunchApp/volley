@@ -25,12 +25,12 @@ import android.text.TextUtils;
 
 import com.android.volley.VolleyLog.MarkerLog;
 
-import org.apache.http.HttpEntity;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Map;
+
+import ch.boye.httpclientandroidlib.HttpEntity;
 
 /**
  * Base class for all network requests.
